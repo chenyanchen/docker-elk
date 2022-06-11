@@ -25,13 +25,11 @@ services:
       - elk
 
   elasticsearch:
-    build:
-      context: elasticsearch/
-      args:
-        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
+    container_name: elasticsearch
     volumes:
       - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,z
-      - elasticsearch:/usr/share/elasticsearch/data:z
+      - ${STORE_PATH}/elasticsearch:/usr/share/elasticsearch/data:z
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -48,17 +46,15 @@ services:
       - elk
 
   logstash:
-    build:
-      context: logstash/
-      args:
-        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    image: docker.elastic.co/logstash/logstash:${ELASTIC_VERSION}
+    container_name: logstash
     volumes:
       - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
       - ./logstash/pipeline:/usr/share/logstash/pipeline:ro,Z
     ports:
       - "5044:5044"
-      - "5000:5000/tcp"
-      - "5000:5000/udp"
+      - "5001:5000/tcp"
+      - "5001:5000/udp"
       - "9600:9600"
     environment:
       LS_JAVA_OPTS: -Xms256m -Xmx256m
@@ -69,10 +65,8 @@ services:
       - elasticsearch
 
   kibana:
-    build:
-      context: kibana/
-      args:
-        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION}
+    container_name: kibana
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
     ports:
@@ -90,4 +84,4 @@ networks:
 
 volumes:
   setup:
-  elasticsearch:
+  # elasticsearch:
